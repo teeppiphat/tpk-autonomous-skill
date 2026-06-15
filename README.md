@@ -81,13 +81,92 @@ files, credentials) are written to `pipeline/<phase>/NEEDS-INPUT.md` for the use
 Everything lives under `pipeline/` in the project root: `state.json` (the spine) + per-phase folders. State survives
 new sessions and context compaction, and can be cleared per phase. **No secrets in `pipeline/`** — gitignore it.
 
-## External tools (preflight checks these)
+## Prerequisites — install the pipeline tools (step by step)
 
-- **NotebookLM** — `notebooklm-mcp-cli` (`nlm` + `notebooklm-mcp`): `uv tool install notebooklm-mcp-cli` → `nlm login` → `nlm setup add claude-code`
-- **Loki Mode** — `bun install -g loki-mode` → `loki doctor`
-- **CloakBrowser + Playwright** — via the cartography harness (`npm install`, `npm run serve`, CDP on :9222)
-- **Deploy MCP** — e.g. Coolify connector (for phases 6–7)
-- **Consultant (optional)** — Codex / Gemini CLI
+The plugin/skill itself only needs Claude Code (or Cowork). The **phases** call external tools — install each
+before the phase that needs it. You don't need everything on day one. `/tpk:preflight` checks all of them and tells
+you exactly what's missing and how to fix it.
+
+### Which tool is needed when
+
+| Tool | Needed for | Required? |
+|---|---|---|
+| NotebookLM (`notebooklm-mcp-cli`) | phases 1–3 (deep research + expert notebooks) | yes, to research |
+| Loki Mode | phase 5 (autonomous build) | yes, to build |
+| CloakBrowser + Playwright | phase 1 (competitor capture) + phase 5 (per-story UI test) | yes for those steps |
+| Deploy MCP (e.g. Coolify) | phases 6–7 (preview env + deploy) | yes to deploy |
+| Codex / Gemini CLI | phases 3 & 4.5 (second-opinion consultant) | optional |
+
+### Step 0 — Base requirements
+
+- **Claude Code** (slash commands) *or* **Cowork** (natural-language skill) — for the plugin itself.
+- **Node.js ≥ 18** and **git** — verify: `node -v` and `git --version`.
+- Two install helpers used below (macOS/Linux):
+  ```bash
+  curl -LsSf https://astral.sh/uv/install.sh | sh      # uv  → for NotebookLM
+  curl -fsSL https://bun.sh/install | bash             # bun → for Loki Mode (fastest)
+  ```
+
+### Step 1 — NotebookLM (phases 1–3) · required
+
+Gives you deep research + the expert notebooks. The package ships both the `nlm` CLI and the `notebooklm-mcp` server.
+
+```bash
+uv tool install notebooklm-mcp-cli      # or: pipx install notebooklm-mcp-cli  / pip install notebooklm-mcp-cli
+nlm login                               # opens a browser, extracts cookies (multi-account: nlm login switch <profile>)
+nlm setup add claude-code               # register the MCP server with Claude Code
+nlm doctor                              # verify install + auth
+```
+
+Notes: this MCP exposes ~35 tools — toggle it with `@notebooklm-mcp` in Claude Code to save context when idle.
+Cookies expire every few weeks; re-run `nlm login` if research stops working.
+
+### Step 2 — Loki Mode (phase 5) · required for the build
+
+The autonomous build engine.
+
+```bash
+bun install -g loki-mode                # or: brew tap asklokesh/tap && brew install loki-mode  / npm install -g loki-mode
+loki doctor                             # checks providers, git, runtime
+```
+
+Loki drives a coding-agent CLI, so make sure a provider is authenticated — an authenticated `claude` login or
+`ANTHROPIC_API_KEY` in the environment.
+
+### Step 3 — CloakBrowser + Playwright (phase 1 capture + phase 5 UI test) · required for those steps
+
+These come with the web-app **cartography harness** repo. From that repo's folder:
+
+```bash
+npm install                             # pulls Playwright + CloakBrowser
+npm run serve                           # start the stealth browser; leave running. Exposes CDP on 127.0.0.1:9222
+```
+
+`/tpk:preflight` confirms the CDP endpoint is reachable on `:9222`. Start `npm run serve` only when you actually run
+a capture or a per-story UI test.
+
+### Step 4 — Consultant (phases 3 & 4.5) · optional
+
+A second model for second opinions during brainstorm/architecture.
+
+```bash
+npm i -g @openai/codex                  # or install the Gemini CLI
+```
+
+### Step 5 — Deploy MCP (phases 6–7) · required to deploy
+
+Connect a deployment connector (e.g. **Coolify**) and set its credentials out-of-band (never in the repo).
+
+- **Claude Code:** `claude mcp add <name> <command>` (or the connector UI), then `claude mcp list` to confirm.
+- **Cowork:** connect it through the connector UI.
+
+### Verify everything at once
+
+- **Claude Code:** `/tpk:preflight` — runs `scripts/preflight.sh` (read-only) and prints a ✓/✗/! readiness table,
+  with the exact remediation command for anything missing.
+- **Cowork:** say *"run preflight"* — the skill checks connectors via the connector UI instead of the CLI.
+
+Full per-tool detail and the phase→tool mapping live in `skills/tpk-pipeline/references/mcp-preflight.md`.
 
 ## Layout
 
