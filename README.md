@@ -18,19 +18,44 @@ Works in **Claude Code** (slash commands `/tpk:*`) and **Cowork** (the bundled s
 The goal of phases 0–4.5 is to make the upstream docs (PRD, epics & stories, architecture) good enough that **phase 5
 runs to completion unattended** — the owner reviews the running system once it has shape, not every document.
 
-## Install (Claude Code)
+---
+
+## Install in Claude Code (from this repo)
+
+This repo ships its own marketplace catalog (`.claude-plugin/marketplace.json`), so it installs in two steps —
+add the marketplace, then install the plugin:
 
 ```text
-/plugin install tpk-autonomous-skill
+/plugin marketplace add teeppiphat/tpk-autonomous-skill
+/plugin install tpk-autonomous-skill@tpk
 /reload-plugins
 ```
 
-(Or add this folder to a local plugin marketplace.) Verify with `/tpk:preflight`.
+- The marketplace registers under the name **`tpk`**, so the plugin id is **`tpk-autonomous-skill@tpk`**.
+- Prefer an explicit git URL? Either of these works in place of the `owner/repo` form:
+  ```text
+  /plugin marketplace add git@github.com:teeppiphat/tpk-autonomous-skill.git
+  /plugin marketplace add https://github.com/teeppiphat/tpk-autonomous-skill.git
+  ```
+- Pin to a branch/tag by appending `#<ref>`, e.g. `…/tpk-autonomous-skill.git#main`.
 
-## Install (Cowork)
+Verify the install with `/tpk:preflight`. To update later: `/plugin marketplace update tpk` then `/reload-plugins`.
 
-Package the skill and install it, or drop the `skills/tpk-pipeline/` folder into your skills directory. Then just
-say: *"start the product pipeline for &lt;idea&gt;"*.
+### Local / development install
+
+Cloned the repo and want to run it without GitHub? Point the marketplace at the local folder:
+
+```text
+/plugin marketplace add ./tpk-autonomous-skill
+/plugin install tpk-autonomous-skill@tpk
+/reload-plugins
+```
+
+## Install in Claude Cowork
+
+Cowork uses skills directly (no marketplace step). Either package the skill and install it, or drop the
+`skills/tpk-pipeline/` folder into your Cowork skills directory. Then trigger it in plain language, e.g.
+*"start the product pipeline for &lt;idea&gt;"*.
 
 ## Commands (Claude Code)
 
@@ -68,17 +93,19 @@ new sessions and context compaction, and can be cleared per phase. **No secrets 
 
 ```
 tpk-autonomous-skill/
-├── .claude-plugin/plugin.json
-├── commands/                       # /tpk:start, status, next, clear, preflight, build
-├── scripts/preflight.sh            # read-only readiness check
+├── .claude-plugin/
+│   ├── plugin.json                  # plugin manifest
+│   └── marketplace.json             # marketplace catalog (makes the repo installable)
+├── commands/                        # /tpk:start, status, next, clear, preflight, build
+├── scripts/preflight.sh             # read-only readiness check
 ├── skills/tpk-pipeline/
-│   ├── SKILL.md                    # orchestrator / control loop (works in CC + Cowork)
+│   ├── SKILL.md                     # orchestrator / control loop (works in CC + Cowork)
 │   ├── references/
-│   │   ├── pipeline-phases.md      # per-phase inputs, doc structures, gates
-│   │   ├── state-protocol.md       # state.json schema, memory, clearing
-│   │   ├── mcp-preflight.md        # which tool per phase + how to verify/fix
-│   │   ├── notebooklm-research.md  # deep research + expert-notebook workflow
-│   │   └── loki-autonomous-build.md# phase 5: agent loop × Loki + quality stack
+│   │   ├── pipeline-phases.md       # per-phase inputs, doc structures, gates
+│   │   ├── state-protocol.md        # state.json schema, memory, clearing
+│   │   ├── mcp-preflight.md         # which tool per phase + how to verify/fix
+│   │   ├── notebooklm-research.md   # deep research + expert-notebook workflow
+│   │   └── loki-autonomous-build.md # phase 5: agent loop × Loki + quality stack
 │   └── assets/
 │       ├── state.template.json
 │       └── needs-input-template.md
