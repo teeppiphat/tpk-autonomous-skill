@@ -1,0 +1,27 @@
+# --- tpk pipeline runtime state (may contain business data / inputs) ---
+pipeline/
+.loki/
+
+# --- secrets: never commit ---
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+.npmrc
+.netrc
+# NotebookLM auth/cookies
+.notebooklm-mcp-cli/
+
+# --- dependencies / build ---
+node_modules/
+dist/
+build/
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*.swp
+*.log
