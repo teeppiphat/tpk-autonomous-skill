@@ -1,0 +1,7 @@
+{
+  "name": "tpk-autonomous-skill",
+  "version": "0.1.0",
+  "description": "Drives a new software product from idea to autonomous build as one gated, state-tracked, 7-phase assembly line. Each phase drafts its key document, flags missing info (researchable vs. needs-user-input), runs MCP preflight, and only advances through a gate — ending in a continuous Loki Mode autonomous build.",
+  "author": { "name": "T.PK" },
+  "keywords": ["pipeline", "product", "prd", "bmad", "loki", "notebooklm", "autonomous", "orchestrator"]
+}

@@ -1,0 +1,20 @@
+{
+  "product": "<one-line product definition>",
+  "level": 4,
+  "current_phase": "00-goal",
+  "updated_at": "",
+  "phases": {
+    "00-goal":          { "status": "pending", "doc": null, "gaps_open": 0, "gate_passed": false },
+    "01-initial-data":  { "status": "pending", "doc": null, "gaps_open": 0, "gate_passed": false },
+    "02-expert-notebooks": { "status": "pending", "doc": null, "gaps_open": 0, "gate_passed": false },
+    "03-analysis":      { "status": "pending", "doc": null, "gaps_open": 0, "gate_passed": false },
+    "04-planning":      { "status": "pending", "doc": null, "gaps_open": 0, "gate_passed": false },
+    "04.5-derisk":      { "status": "pending", "doc": null, "gaps_open": 0, "gate_passed": false },
+    "05-autonomous-build": { "status": "pending", "doc": null, "gaps_open": 0, "gate_passed": false },
+    "06-review":        { "status": "pending", "doc": null, "gaps_open": 0, "gate_passed": false },
+    "07-production":    { "status": "pending", "doc": null, "gaps_open": 0, "gate_passed": false }
+  },
+  "notebooks": [],
+  "decisions": [],
+  "preflight": { "notebooklm": "unknown", "loki": "unknown", "playwright": "unknown", "deploy": "unknown" }
+}
